@@ -5,6 +5,7 @@ const crypto = require('crypto');
 const {
   spawnFaktory,
   shutdownFaktory,
+  createJob,
   createClient: create,
   queueName,
   withConnection: connect
@@ -79,7 +80,9 @@ const {
   test('client logs when a reply is received with no command', (t) => {
     const client = create();
     t.true(client.queue.length === 0);
-    t.falsy(client.receive('OK'));
+    t.throws(() => {
+      client.receive('OK')
+    });
   });
 
   test('client builds a hex pwdhash with salt', (t) => {
@@ -116,34 +119,17 @@ const {
     await connect(async (client) => {
       const args = [0, 1, 2, 3, 4];
       const responses = await Promise.all(
-        args.map((i) => {
-          return client.push({
-            jobtype: 'testJob',
-            queue: queueName('client-concurrent-requests'),
-            args: [i]
-          });
-        })
+        args.map((i) => client.push(createJob(i)))
       );
-      const oks = responses.filter((text) => text === 'OK');
-      t.is(oks.length, args.length);
-    });
-  });
-
-  test('client push', async (t) => {
-    await connect(async (client) => {
-      t.pass();
+      t.is(responses.length, args.length);
+      responses.forEach((resp) => t.truthy(resp));
     });
   });
 
   test('client serial pushes', async (t) => {
     await connect(async (client) => {
       for (let i = 4; i >= 0; i--) {
-        const resp = await client.push({
-          jobtype: 'testJob',
-          queue: queueName('client-serial-pushes'),
-          args: [i]
-        });
-        t.is(resp, 'OK');
+        t.truthy(await client.push(createJob(i)));
       }
     });
   });
@@ -152,30 +138,19 @@ const {
     await connect(async (client) => {
       const args = [0, 1, 2, 3, 4];
       const responses = await Promise.all(
-        args.map((i) => {
-          return client.push({
-            jobtype: 'testJob',
-            queue: queueName('client-concurrent-pushes'),
-            args: [i]
-          });
-        })
+        args.map((i) => client.push(createJob(i)))
       );
-      t.deepEqual(responses, args.map(() => 'OK'));
+      t.is(responses.length, args.length);
+      responses.forEach((resp) => t.truthy(resp));
     });
   });
 
   test('client fetches', async (t) => {
     await connect(async (client) => {
-      const queue = queueName('client-fetches');
-      const args = [123456];
-      const job = {
-        jobtype: 'myJob',
-        queue,
-        args
-      };
-      t.is(await client.push(job), 'OK');
+      const job = createJob(123456);
+      t.truthy(await client.push(job));
 
-      let fetched = await client.fetch(queue);
+      let fetched = await client.fetch(job.queue);
 
       t.truthy(fetched);
       t.truthy(fetched.jid, 'job has jid');
@@ -186,14 +161,8 @@ const {
 
   test('client rejects when expectation doesn\'t match response', async (t) => {
     await connect(async (client) => {
-      const queue = queueName('expectation-throw');
-      const job = {
-        jobtype: 'testJob',
-        queue,
-        args: []
-      };
       // response is 'OK'
-      await t.throws(client.send(['PUSH', job], 'NOT OK'));
+      await t.throws(client.send(['PUSH', createJob()], 'NOT OK'));
     });
   });
 
@@ -204,13 +173,30 @@ const {
     });
   });
 
-  test('client sends a heartbeat correctly', async (t) => {
+  test('client sends a heartbeat successfully', async (t) => {
     await connect(async (client) => {
       t.is(await client.beat(), 'OK');
     });
   });
 
-  test.todo('same connection used concurrently');
+  test('client ACKs a job', async (t) => {
+    await connect(async (client) => {
+      const job = createJob();
+      await client.push(job);
+      const fetched = await client.fetch(job.queue);
+      t.is(await client.ack(fetched.jid), 'OK');
+    });
+  });
+
+  test('client FAILs a job', async (t) => {
+    await connect(async (client) => {
+      const job = createJob();
+      await client.push(job);
+      const fetched = await client.fetch(job.queue);
+      t.is(await client.fail(fetched.jid, new Error('EHANGRY')), 'OK');
+      // assert error data...
+    });
+  });
 
 })();
 

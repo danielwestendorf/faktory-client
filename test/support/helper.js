@@ -36,8 +36,16 @@ const getInfo = (conn) => {
   return conn.send(['INFO']);
 };
 
-const queueName = (label) => {
+const queueName = (label = 'test') => {
   return `${label}-${uuid().slice(0, 6)}`;
+};
+
+const createJob = (...args) => {
+  return {
+    jobtype: 'testJob',
+    queue: queueName(),
+    args
+  };
 };
 
 const spawnFaktory = () => {
@@ -99,6 +107,7 @@ const shutdownFaktory = () => {
 module.exports = {
   queueName,
   createClient,
+  createJob,
   withConnection,
   spawnFaktory,
   shutdownFaktory

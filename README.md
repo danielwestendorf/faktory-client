@@ -43,6 +43,10 @@ const job = await client.fetch('default', 'critical', 'low');
 
 job.jid
 // 8ec88fc8-5060-451c-8ebb-efd4cb9c4a97
+
+await client.ack(job.jid);
+// or
+await client.fail(job.jid, new Error('guess again!'));
 ```
 
 See [tests](test) for more examples.
