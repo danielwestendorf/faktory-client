@@ -1,6 +1,6 @@
 {
   "name": "faktory-client",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "A node.js client library for Faktory job server",
   "main": "index.js",
   "scripts": {
@@ -40,5 +40,7 @@
     "verbose": true,
     "timeout": "10s"
   },
-  "engines" : { "node" : ">=7" }
+  "engines": {
+    "node": ">=7"
+  }
 }
