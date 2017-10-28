@@ -43,28 +43,29 @@ const {
     t.is(client.port, 7419, 'port is 7419');
   });
 
-  test('client builds a passwordless hello', (t) => {
+  test('client builds a passwordless ahoy', (t) => {
     const client = create();
     const hello = client.buildHello();
     t.truthy(hello.hostname, 'hostname is present');
   });
 
-  test('wid is present', (t) => {
+  test('wid is present in ahoy', (t) => {
     const client = create();
     const hello = client.buildHello();
     t.truthy(hello.wid, 'wid is present');
   });
 
-  test('pid is present', (t) => {
+  test('pid is present in ahoy', (t) => {
     const client = create();
     const hello = client.buildHello();
     t.truthy(hello.pid, 'pid is present');
   });
 
-  test('labels are present', (t) => {
-    const client = create();
+  test('labels are passed in ahoy', (t) => {
+    const labels = ['hippo'];
+    const client = create({ labels });
     const hello = client.buildHello();
-    t.truthy(hello.labels, 'labels are present');
+    t.deepEqual(hello.labels, labels);
   });
 
   test('checkVersion throws when version mismatch', (t) => {
