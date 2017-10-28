@@ -27,19 +27,14 @@
   },
   "homepage": "https://github.com/jbielick/faktory-client#readme",
   "dependencies": {
-    "ava": "^0.23.0",
     "debug": "^3.1.0",
-    "nyc": "^11.2.1",
     "redis-parser": "^3.0.0",
     "uuid": "^3.1.0"
   },
   "devDependencies": {
-    "coveralls": "^3.0.0",
-    "tap-bail": "^1.0.0",
-    "tap-diff": "^0.1.1",
-    "tap-dot": "^1.0.5",
-    "tap-nyc": "^1.0.3",
-    "tape": "^4.8.0"
+    "ava": "^0.23.0",
+    "nyc": "^11.2.1",
+    "coveralls": "^3.0.0"
   },
   "ava": {
     "verbose": true,
