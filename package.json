@@ -39,5 +39,6 @@
   "ava": {
     "verbose": true,
     "timeout": "10s"
-  }
+  },
+  "engines" : { "node" : ">=7" }
 }
