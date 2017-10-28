@@ -1,0 +1,47 @@
+{
+  "name": "faktory-client",
+  "version": "0.1.0",
+  "description": "A node.js client library for Faktory job server",
+  "main": "index.js",
+  "scripts": {
+    "test": "nyc --cache ava test/**/*.test.js",
+    "coverage": "nyc report --reporter=html"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jbielick/faktory-client.git"
+  },
+  "keywords": [
+    "faktory",
+    "client",
+    "node",
+    "server",
+    "job",
+    "background",
+    "async"
+  ],
+  "author": "Josh Bielick <jbielick@gmail.com>",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/jbielick/faktory-client/issues"
+  },
+  "homepage": "https://github.com/jbielick/faktory-client#readme",
+  "dependencies": {
+    "ava": "^0.23.0",
+    "debug": "^3.1.0",
+    "nyc": "^11.2.1",
+    "redis-parser": "^3.0.0",
+    "uuid": "^3.1.0"
+  },
+  "devDependencies": {
+    "tap-bail": "^1.0.0",
+    "tap-diff": "^0.1.1",
+    "tap-dot": "^1.0.5",
+    "tap-nyc": "^1.0.3",
+    "tape": "^4.8.0"
+  },
+  "ava": {
+    "verbose": true,
+    "timeout": "10s"
+  }
+}
