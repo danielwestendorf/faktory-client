@@ -27,12 +27,6 @@ test('Client.create returns a client', (t) => {
   t.is(Client.create().constructor, Client);
 });
 
-test('client has a wid from construction', (t) => {
-  const client = create();
-  t.truthy(client.wid, 'wid is present');
-  t.true(client.wid.length >= 8, 'wid is length 6');
-});
-
 test('client defaults to localhost', (t) => {
   const client = create();
   t.is(client.host, 'localhost', 'host is localhost');
@@ -52,7 +46,7 @@ test('client builds a passwordless ahoy', (t) => {
 test('wid is present in ahoy', (t) => {
   const client = create();
   const hello = client.buildHello();
-  t.truthy(hello.wid, 'wid is present');
+  t.is(hello.wid.length, 8, 'wid is present');
 });
 
 test('pid is present in ahoy', (t) => {
