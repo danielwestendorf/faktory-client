@@ -5,9 +5,7 @@ const Client = require('../../lib/client');
 let faktoryProcess;
 let started = false;
 
-const createClient = (opts) => {
-  return new Client(opts);
-};
+const createClient = (opts) => new Client(opts);
 
 const withConnection = async (opts, cb) => {
   if (!cb && opts) {
