@@ -65,8 +65,9 @@ See the [Faktory client for other languages](https://github.com/contribsys/fakto
 
 ## TODO
 
-- [ ] Heartbeat
+- [x] Heartbea
 - [ ] Connection interrupt graceful shutdown
+- [ ] Quiet/Stop signal handling from server
 - [ ] Reconnects
 - [ ] TLS
 

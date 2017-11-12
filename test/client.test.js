@@ -11,20 +11,18 @@ const {
   withConnection: connect
 } = require('./support/helper');
 
-
 test.before(async () => {
   await spawnFaktory();
+  await connect((client) => {
+    return client.flush();
+  });
 });
 
 test.after.always(async () => {
-  await connect(async (client) => {
-    await client.flush();
+  await connect((client) => {
+    return client.flush();
   });
   shutdownFaktory();
-});
-
-test('Client.create returns a client', (t) => {
-  t.is(Client.create().constructor, Client);
 });
 
 test('client defaults to localhost', (t) => {
@@ -39,58 +37,61 @@ test('client defaults to port 7419', (t) => {
 
 test('client builds a passwordless ahoy', (t) => {
   const client = create();
-  const hello = client.buildHello();
+  const hello = client.buildHello({});
   t.truthy(hello.hostname, 'hostname is present');
 });
 
 test('wid is present in ahoy', (t) => {
-  const client = create();
-  const hello = client.buildHello();
-  t.is(hello.wid.length, 8, 'wid is present');
+  const wid = 'workerid';
+  const client = create({ wid });
+  const hello = client.buildHello({});
+  t.is(hello.wid, wid, 'wid in ahoy does not match');
 });
 
-test('pid is present in ahoy', (t) => {
+test('pid is present when wid is given in ahoy', (t) => {
   const client = create();
-  const hello = client.buildHello();
-  t.truthy(hello.pid, 'pid is present');
+  const hello = client.buildHello({});
+  t.truthy(!hello.pid, 'pid should not be present');
 });
 
 test('labels are passed in ahoy', (t) => {
   const labels = ['hippo'];
   const client = create({ labels });
-  const hello = client.buildHello();
-  t.deepEqual(hello.labels, labels);
+  const hello = client.buildHello({});
+  t.deepEqual(hello.labels, labels, 'hello does not includes labels correctly');
 });
 
 test('checkVersion throws when version mismatch', (t) => {
   t.throws(() => {
-    // 2 is not supported at this time
-    Client.checkVersion('2');
+    Client.checkVersion(3);
+    Client.checkVersion(1);
   });
   t.notThrows(() => {
-    Client.checkVersion('1');
-  });
+    Client.checkVersion(2);
+  }, 'does not throw when version does not match');
 });
 
 test('client logs when a reply is received with no command', (t) => {
   const client = create();
   t.true(client.queue.length === 0);
   t.throws(() => {
-    client.receive('OK')
+    client.receive('OK');
   });
 });
 
 test('client builds a hex pwdhash with salt', (t) => {
+  const iterations = 10;
   const password = 'password1';
   const salt = 'dozens';
   const client = create({ password });
-  const hello = client.buildHello(salt);
-  const hash = crypto
-    .createHash('sha256')
-    .update(password + salt)
-    .digest('hex');
+  const hello = client.buildHello({ s: salt, i: iterations });
+  let hash = crypto.createHash('sha256').update(password + salt);
 
-  t.is(hello.pwdhash, hash, 'pwdhash created correctly');
+  for (let i = 1; i < iterations; i++) {
+    hash = crypto.createHash('sha256').update(hash.digest());
+  }
+
+  t.is(hello.pwdhash, hash.digest('hex'), 'pwdhash not generated correctly');
 });
 
 test('client send and reply INFO', async (t) => {
@@ -144,9 +145,8 @@ test('client fetches', async (t) => {
 });
 
 test('client rejects when expectation doesn\'t match response', async (t) => {
-  await connect(async (client) => {
-    // response is 'OK'
-    await t.throws(client.send(['PUSH', createJob()], 'NOT OK'));
+  await connect((client) => {
+    return t.throws(client.send(['PUSH', createJob()], 'NOT OK'));
   });
 });
 
@@ -158,7 +158,7 @@ test('client resolves when connect is called after connection', async (t) => {
 });
 
 test('client sends a heartbeat successfully', async (t) => {
-  await connect(async (client) => {
+  await connect({ wid: '12345678' }, async (client) => {
     t.is(await client.beat(), 'OK');
   });
 });

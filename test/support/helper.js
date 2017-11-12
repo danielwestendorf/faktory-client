@@ -23,8 +23,6 @@ const withConnection = async (opts, cb) => {
   } catch(e) {
     throw e;
   } finally {
-    // debug('Flushing');
-    // await client.send(['FLUSH']);
     debug('Shutting down client');
     await client.shutdown();
   }
@@ -57,29 +55,27 @@ const spawnFaktory = () => {
         '--rm',
         '-p',
         '7419:7419',
-        'contribsys/faktory:0.5.0',
+        'contribsys/faktory:0.6.0',
         '-b',
-         ':7419',
-        '-no-tls'
+         ':7419'
       ]
     );
 
-    // faktoryProcess.stdout.on('data', (data) => {
-    //   console.log(`out: ${data.toString()}`);
-    //   resolve(data.toString());
-    // });
-
     faktoryProcess.stderr.on('data', (data) => {
-      // console.error(`error ${data.toString()}`);
+      console.log(data.toString());
+    });
+
+    faktoryProcess.stdout.on('data', (data) => {
       const message = data.toString();
       debug(message);
       if (!started && /Now listening at :/.test(message)) {
         started = true;
         resolve(faktoryProcess);
       }
-    });
+    })
 
     faktoryProcess.on('error', (err) => {
+      console.err(err);
       debug('Failed to start Faktory');
       reject(err);
     });
