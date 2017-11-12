@@ -19,7 +19,7 @@ const withConnection = async (opts, cb) => {
   await client.connect();
 
   try {
-    await cb(client);
+    return cb(client);
   } catch(e) {
     throw e;
   } finally {
