@@ -1,3 +1,18 @@
+0.4.3 | 2017-11-12
+---
+
+ * Bufix: in the rare case a response is dropped from the server, the code was using a variable that was not defined to log the dropped message.
+
+0.4.2 | 2017-11-12
+---
+
+ * Bugfix: server now sends NULL for fetch requests when queues are empty. The code attempted to use string methods on this, expecting that it was a buffer/string.
+
+0.4.1 | 2017-11-12
+---
+
+ * Test updates
+
 0.4.0 | 2017-11-12
 ---
 
