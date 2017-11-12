@@ -164,6 +164,13 @@ test('client ACKs a job', async (t) => {
   });
 });
 
+test('client fetches when queues are empty', async (t) => {
+  await connect(async (client) => {
+    const fetched = await client.fetch(queueName());
+    t.is(fetched, null);
+  });
+});
+
 test('client FAILs a job', async (t) => {
   await connect(async (client) => {
     const job = createJob();
