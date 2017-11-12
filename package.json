@@ -41,7 +41,6 @@
     "nyc": "^11.2.1"
   },
   "ava": {
-    "concurrency": 1,
     "verbose": true,
     "timeout": "10s"
   },

@@ -1,5 +1,4 @@
 const debug = require('debug')('faktory-client:test-helper');
-const { spawn } = require('child_process');
 const uuid = require('uuid/v4');
 const Client = require('../../lib/client');
 let faktoryProcess;
@@ -44,65 +43,9 @@ const createJob = (...args) => {
   };
 };
 
-const spawnFaktory = () => {
-  return new Promise((resolve, reject) => {
-    debug('Spawning Faktory');
-
-    faktoryProcess = spawn(
-      'docker',
-      [
-        'run',
-        '--rm',
-        '-p',
-        '7419:7419',
-        'contribsys/faktory:0.6.0',
-        '-b',
-         ':7419'
-      ]
-    );
-
-    faktoryProcess.stderr.on('data', (data) => {
-      console.log(data.toString());
-    });
-
-    faktoryProcess.stdout.on('data', (data) => {
-      const message = data.toString();
-      debug(message);
-      if (!started && /Now listening at :/.test(message)) {
-        started = true;
-        resolve(faktoryProcess);
-      }
-    })
-
-    faktoryProcess.on('error', (err) => {
-      console.err(err);
-      debug('Failed to start Faktory');
-      reject(err);
-    });
-
-    faktoryProcess.on('exit', (code) => {
-      started = false;
-      if (code !== 0) {
-        reject(new Error(`Faktory exited with code ${code}`));
-      }
-    });
-  });
-
-  return ls;
-};
-
-const shutdownFaktory = () => {
-  if (faktoryProcess && started) {
-    debug('Signaling Faktory');
-    faktoryProcess.kill();
-  }
-};
-
 module.exports = {
   queueName,
   createClient,
   createJob,
-  withConnection,
-  spawnFaktory,
-  shutdownFaktory
+  withConnection
 };

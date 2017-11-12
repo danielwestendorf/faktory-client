@@ -1,7 +1,7 @@
 0.4.0 | 2017-11-12
 ---
 
- * Updates for faktory protocol verison 2 compatibility
+ * Updates for faktory protocol verison 2 compatibility https://github.com/contribsys/faktory/pull/72
 
 ### Breaking
 

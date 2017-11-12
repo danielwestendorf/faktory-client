@@ -3,8 +3,6 @@ const test = require('ava');
 const Client = require('../lib/client');
 const crypto = require('crypto');
 const {
-  spawnFaktory,
-  shutdownFaktory,
   createJob,
   createClient: create,
   queueName,
@@ -12,17 +10,11 @@ const {
 } = require('./support/helper');
 
 test.before(async () => {
-  await spawnFaktory();
-  await connect((client) => {
-    return client.flush();
-  });
+  await connect(client => client.flush());
 });
 
 test.after.always(async () => {
-  await connect((client) => {
-    return client.flush();
-  });
-  shutdownFaktory();
+  await connect(client => client.flush());
 });
 
 test('client defaults to localhost', (t) => {
@@ -180,8 +172,4 @@ test('client FAILs a job', async (t) => {
     t.is(await client.fail(fetched.jid, new Error('EHANGRY')), 'OK');
     // assert error data...
   });
-});
-
-process.on('exit', () => {
-  shutdownFaktory();
 });
