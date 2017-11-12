@@ -9,6 +9,8 @@ A node.js client for the Faktory job server
 
 This repository provides a node.js client for [Faktory](https://github.com/contribsys/faktory). The client allows you to push jobs, fetch jobs, and otherwise communicate with the Faktory server.
 
+**If you're looking for a faktory worker framework for node.js, take a look at [`jbielick/faktory_worker_node`](https://github.com/jbielick/faktory_worker_node). This is just the connection client library.**
+
 ## Installation
 
 ```
@@ -73,16 +75,15 @@ See the [Faktory client for other languages](https://github.com/contribsys/fakto
 
 ## Development
 
-Use docker-compose for easy setup of the faktory server:
+Install docker.
 
-`docker-compose run server` to start the faktory server container.
+`bin/server` will run the faktory server in a docker container. The server is available at `localhost:7419`
 
 Use `DEBUG=faktory*` to see debug lines.
 
 ## Tests
 
-The test suite will start a faktory server docker container and bind to
-port 7419 on localhost.
+Start a faktory server on localhost or use `bin/server`.
 
 `npm test` will run the tests concurrently with ava.
 
