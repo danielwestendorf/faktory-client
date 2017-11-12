@@ -110,17 +110,6 @@ test('client subsequent serial requests', async (t) => {
   });
 });
 
-test('client concurrent requests', async (t) => {
-  await connect(async (client) => {
-    const args = [0, 1, 2, 3, 4];
-    const responses = await Promise.all(
-      args.map((i) => client.push(createJob(i)))
-    );
-    t.is(responses.length, args.length);
-    responses.forEach((resp) => t.truthy(resp));
-  });
-});
-
 test('client serial pushes', async (t) => {
   await connect(async (client) => {
     for (let i = 4; i > 0; i--) {
