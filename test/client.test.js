@@ -24,7 +24,7 @@ test('client defaults to localhost', (t) => {
 
 test('client defaults to port 7419', (t) => {
   const client = create();
-  t.is(client.port, 7419, 'port is 7419');
+  t.is(client.port, '7419', 'port is 7419');
 });
 
 test('client builds a passwordless ahoy', (t) => {
@@ -65,7 +65,7 @@ test('checkVersion throws when version mismatch', (t) => {
 
 test('client logs when a reply is received with no command', (t) => {
   const client = create();
-  t.true(client.queue.length === 0);
+  t.true(client.replyQueue.length === 0);
   t.throws(() => {
     client.receive('OK');
   });
@@ -142,16 +142,28 @@ test('client rejects when expectation doesn\'t match response', async (t) => {
   });
 });
 
-test('client resolves when connect is called after connection', async (t) => {
-  await connect(async (client) => {
-    t.true(client.connected);
-    t.is(await client.connect(), client);
-  });
-});
-
 test('client sends a heartbeat successfully', async (t) => {
   await connect({ wid: '12345678' }, async (client) => {
     t.is(await client.beat(), 'OK');
+  });
+});
+
+test('client throws on send when socket is not writable', async (t) => {
+  await connect({reconnectLimit: 0}, async (client) => {
+    client.socket.end();
+    await t.throws(client.info(), /not writable/);
+  });
+});
+
+test('client reconnects when socket is closed unexpectedly', async (t) => {
+  await connect({reconnectDelay: 1}, async (client) => {
+    client.socket.end();
+    return new Promise((resolve) => {
+      client.socket.on('connect', () => {
+        t.pass();
+        resolve();
+      })
+    });
   });
 });
 
@@ -162,6 +174,24 @@ test('client ACKs a job', async (t) => {
     const fetched = await client.fetch(job.queue);
     t.is(await client.ack(fetched.jid), 'OK');
   });
+});
+
+test('client rejects connect when connection cannot be established', async (t) => {
+  const client = new Client({
+    url: 'localhost:7488',
+    reconnectDelay: 1,
+    reconnectLimit: 0,
+  });
+  await t.throws(client.connect(), /ECONNREFUSED/);
+});
+
+test('client rejects connect if handshake is not successful', async (t) => {
+  const client = new Client({
+    reconnectDelay: 1,
+    reconnectLimit: 0,
+  });
+  client.buildHello = () => '';
+  await t.throws(client.connect(), /unable to connect/i);
 });
 
 test('client fetches when queues are empty', async (t) => {

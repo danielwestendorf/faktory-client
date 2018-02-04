@@ -1,7 +1,7 @@
 0.4.3 | 2017-11-12
 ---
 
- * Bufix: in the rare case a response is dropped from the server, the code was using a variable that was not defined to log the dropped message.
+ * Bugfix: in the rare case a response is dropped from the server, the code was using a variable that was not defined to log the dropped message.
 
 0.4.2 | 2017-11-12
 ---

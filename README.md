@@ -67,10 +67,10 @@ See the [Faktory client for other languages](https://github.com/contribsys/fakto
 
 ## TODO
 
-- [x] Heartbea
-- [ ] Connection interrupt graceful shutdown
-- [ ] Quiet/Stop signal handling from server
-- [ ] Reconnects
+- [x] Heartbeats
+- [x] Reconnects
+- [x] Connection interrupt graceful shutdown
+- [x] Quiet/Stop signal handling from server
 - [ ] TLS
 
 ## Development

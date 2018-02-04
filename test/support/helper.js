@@ -23,7 +23,7 @@ const withConnection = async (opts, cb) => {
     throw e;
   } finally {
     debug('Shutting down client');
-    await client.shutdown();
+    await client.close();
   }
 };
 
