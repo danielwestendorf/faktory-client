@@ -167,12 +167,13 @@ test('client reconnects when socket is closed unexpectedly', async (t) => {
   });
 });
 
-test('client ACKs a job', async (t) => {
-  await connect(async (client) => {
-    const job = createJob();
-    await client.push(job);
-    const fetched = await client.fetch(job.queue);
-    t.is(await client.ack(fetched.jid), 'OK');
+test('client rejects pending replies when socket is closed', async (t) => {
+  await connect({reconnectLimit: 0}, async (client) => {
+    const promise = client.fetch('default');
+    setTimeout(() => {
+      client.socket.destroy();
+    }, 1);
+    await t.throws(promise, /connection closed/i);
   });
 });
 
@@ -190,8 +191,19 @@ test('client rejects connect if handshake is not successful', async (t) => {
     reconnectDelay: 1,
     reconnectLimit: 0,
   });
-  client.buildHello = () => '';
-  await t.throws(client.connect(), /unable to connect/i);
+  client.buildHello = () => {
+    throw new Error('test')
+  };
+  await t.throws(client.connect(), /test/i);
+});
+
+test('client ACKs a job', async (t) => {
+  await connect(async (client) => {
+    const job = createJob();
+    await client.push(job);
+    const fetched = await client.fetch(job.queue);
+    t.is(await client.ack(fetched.jid), 'OK');
+  });
 });
 
 test('client fetches when queues are empty', async (t) => {
