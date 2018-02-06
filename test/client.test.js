@@ -149,26 +149,26 @@ test('client sends a heartbeat successfully', async (t) => {
 });
 
 test('client throws on send when socket is not writable', async (t) => {
-  await connect({reconnectLimit: 0}, async (client) => {
+  await connect(async (client) => {
     client.socket.end();
     await t.throws(client.info(), /not writable/);
   });
 });
 
 test('client reconnects when socket is closed unexpectedly', async (t) => {
-  await connect({reconnectDelay: 1}, async (client) => {
+  await connect(async (client) => {
     client.socket.end();
     return new Promise((resolve) => {
       client.socket.on('connect', () => {
         t.pass();
         resolve();
-      })
+      });
     });
   });
 });
 
 test('client rejects pending replies when socket is closed', async (t) => {
-  await connect({reconnectLimit: 0}, async (client) => {
+  await connect(async (client) => {
     const promise = client.fetch('default');
     setTimeout(() => {
       client.socket.destroy();
@@ -178,21 +178,14 @@ test('client rejects pending replies when socket is closed', async (t) => {
 });
 
 test('client rejects connect when connection cannot be established', async (t) => {
-  const client = new Client({
-    url: 'localhost:7488',
-    reconnectDelay: 1,
-    reconnectLimit: 0,
-  });
+  const client = new Client({url: 'localhost:7488'});
   await t.throws(client.connect(), /ECONNREFUSED/);
 });
 
 test('client rejects connect if handshake is not successful', async (t) => {
-  const client = new Client({
-    reconnectDelay: 1,
-    reconnectLimit: 0,
-  });
+  const client = new Client();
   client.buildHello = () => {
-    throw new Error('test')
+    throw new Error('test');
   };
   await t.throws(client.connect(), /test/i);
 });
