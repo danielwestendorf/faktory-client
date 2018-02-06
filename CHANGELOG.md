@@ -1,3 +1,11 @@
+0.5.0 | 2018-02-04
+---
+
+ * Refactor connection process: reconnect on close if not initial connection attempt
+ * Improve debug logging output
+ * Use assert module for response expectations
+ * Parse connection URLs better (allow tcp://)
+
 0.4.3 | 2017-11-12
 ---
 
